@@ -1,0 +1,41 @@
+﻿@model BasicCrud.Models.Food
+
+@{
+    ViewData["Title"] = "Add";
+}
+<h2>Add a food</h2>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Index">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Name" class="control-label"></label>
+                <input asp-for="Name" class="form-control" autofocus />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="FoodGroup" class="control-label"></label>
+                <select asp-for="FoodGroup" asp-items="Html.GetEnumSelectList<FoodGroup>()" class="form-control"></select>
+                <span asp-validation-for="FoodGroup" class="text-danger"></span>
+            </div>
+            <div class="form-group form-check">
+                <label class="form-check-label">
+                    <input class="form-check-input" asp-for="IsHealthy" /> @Html.DisplayNameFor(model => model.IsHealthy)
+                </label>
+            </div>
+            <div class="form-group">
+                <label asp-for="Rating" class="control-label"></label>
+                <input asp-for="Rating" class="form-control" />
+                <span asp-validation-for="Rating" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
