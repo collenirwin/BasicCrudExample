@@ -3,6 +3,9 @@ using BasicCrud.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Dynamic;
+using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace BasicCrud.Services
@@ -10,7 +13,7 @@ namespace BasicCrud.Services
     /// <summary>
     /// Provides methods for querying the Food table of the database
     /// </summary>
-    public class FoodService : IAsyncCrudService<Food, string>
+    public class FoodService
     {
         private readonly AppDbContext _context;
 
@@ -64,6 +67,49 @@ namespace BasicCrud.Services
         public async Task<Food> GetByIdAsync(string id)
         {
             return await _context.Foods.SingleOrDefaultAsync(food => food.Id == id);
+        }
+
+        /// <summary>
+        /// Get all foods that match the given filter, optionally ordered by the specified expression
+        /// </summary>
+        /// <typeparam name="TKey">The property to order by</typeparam>
+        /// <param name="filter">Filter specification object</param>
+        /// <param name="orderBy">Key selector expression to determine the property to order by</param>
+        /// <param name="ascendingOrder">Should we sort in ascendin order?</param>
+        /// <returns>A collection containing all foods that match the filter</returns>
+        public async Task<IEnumerable<Food>> GetFilteredAsync<TKey>(FoodFilter filter,
+            Expression<Func<Food, TKey>> orderBy = null, bool ascendingOrder = true)
+        {
+            var query = _context.Foods.AsQueryable();
+
+            if (filter.Name != null)
+            {
+                query = query.Where(food => food.Name.Contains(filter.Name));
+            }
+
+            if (filter.FoodGroup != null)
+            {
+                query = query.Where(food => food.FoodGroup == filter.FoodGroup);
+            }
+
+            if (filter.IsHealthy != null)
+            {
+                query = query.Where(food => food.IsHealthy == filter.IsHealthy);
+            }
+
+            if (filter.MinRating != 0.0 || filter.MaxRating != 10.0)
+            {
+                query = query.Where(food => food.Rating >= filter.MinRating && food.Rating <= filter.MaxRating);
+            }
+
+            if (orderBy != null)
+            {
+                query = ascendingOrder
+                    ? query.OrderBy(orderBy)
+                    : query.OrderByDescending(orderBy);
+            }
+
+            return await query.ToListAsync();
         }
 
         /// <summary>

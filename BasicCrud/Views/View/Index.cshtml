@@ -1,0 +1,90 @@
+﻿@model ViewViewModel
+
+@{
+    ViewData["Title"] = "View";
+}
+
+<h1>View foods</h1>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Index" method="get">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="form-group">
+                <label asp-for="Filter.Name" class="control-label"></label>
+                <input asp-for="Filter.Name" class="form-control" autofocus />
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Filter.FoodGroup" class="control-label"></label>
+                <select asp-for="Filter.FoodGroup" asp-items="Html.GetEnumSelectList<FoodGroup>()" class="form-control">
+                    <option value="">No filter</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Filter.IsHealthy" class="control-label"></label>
+                @Html.DropDownListFor(model => model.Filter.IsHealthy, new SelectList(
+                    new []
+                    {
+                        new { Value = "true", Text = "Yes" },
+                        new { Value = "false", Text = "No" }
+                    },
+                    "Value",
+                    "Text",
+                    Model.Filter.IsHealthy
+                ), "No filter", new { @class = "form-control" })
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Filter.MinRating" class="control-label"></label>
+                <input asp-for="Filter.MinRating" class="form-control" />
+                <label asp-for="Filter.MaxRating" class="control-label"></label>
+                <input asp-for="Filter.MaxRating" class="form-control" />
+            </div>
+
+            <div class="form-group">
+                <input type="submit" class="btn btn-primary" value="View" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<table id="table" class="table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Food Group</th>
+            <th>Healthy</th>
+            <th>Rating</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model.Foods != null)
+        {
+            @foreach (var item in Model.Foods)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.DisplayName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.FoodGroup)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.IsHealthy)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Rating)
+                    </td>
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                        <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                    </td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
